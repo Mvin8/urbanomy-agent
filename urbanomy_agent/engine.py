@@ -3,7 +3,7 @@ import json
 
 import numpy as np
 
-from urbanomy_agent.land_value import (
+from urbanomy.land_value import (
     CATEGORICAL_FEATURES, ORIGINAL_FEATURES, DistrictProblem, LandPriceEstimator,
     ScenarioTEPModifier, StrategicAlignmentScorer, build_pareto_front_dataframe,
 )

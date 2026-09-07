@@ -20,7 +20,7 @@ from pymoo.core.problem import Problem
 from pymoo.optimize import minimize  # Функция для запуска оптимизации
 from pydantic import BaseModel, Field
 
-from urbanomy_agent.investment import (
+from urbanomy.investment import (
     DEFAULT_BENCHMARKS_RU,
     InvestmentAttractivenessAnalyzer,
 )

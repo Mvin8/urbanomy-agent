@@ -13,7 +13,7 @@
 | Настроить пути и окружение | `urbanomy_agent/settings.py`, `.env.example` | `tests/test_settings.py` |
 | Добавить набор кварталов | `data/datasets.json`, `urbanomy_agent/data.py` | `tests/test_data.py` |
 | Изменить строгие ограничения | `urbanomy_agent/engine.py` | `tests/test_optimization.py` |
-| Изменить модель/сценарии | `urbanomy_agent/land_value/`, `urbanomy_agent/investment/` | `tests/test_optimization.py` |
+| Изменить модель/сценарии | `urbanomy/land_value/`, `urbanomy/investment/` | `tests/test_optimization.py` |
 | Обновить каталог и карточку | `scripts/generate_docs.py` | `tests/test_tool_catalog_docs.py` |
 
 ## Маршруты чтения

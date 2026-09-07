@@ -4,4 +4,4 @@ from .investment_metrics import (
     calculate_investment_metrics,
 )
 from .constants import DEFAULT_BENCHMARKS_RU, LAND_USE_TO_POTENTIAL_COLUMN
-from urbanomy_agent.investment.input import prepare_investment_input
+from urbanomy.investment.input import prepare_investment_input

@@ -13,7 +13,7 @@ import pandas as pd
 
 from blocksnet.enums import LandUse
 
-from urbanomy_agent.investment.input import (
+from urbanomy.investment.input import (
     INVESTMENT_NUMERIC_COLUMNS,
     LAND_USE_SHARE_COLUMNS,
     prepare_investment_input,

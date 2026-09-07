@@ -34,7 +34,7 @@ def test_explicit_bounds_can_replace_undefined_baseline(blocks):
 
 
 def test_final_constraints_and_llm_strategy(blocks, monkeypatch):
-    from urbanomy_agent.land_value import StrategicAlignmentScorer
+    from urbanomy.land_value import StrategicAlignmentScorer
 
     seen = []
     class LLM:
@@ -62,7 +62,7 @@ def test_final_constraints_and_llm_strategy(blocks, monkeypatch):
 
 
 def test_derived_impossible_constraint_never_scores_llm(blocks, monkeypatch):
-    from urbanomy_agent.land_value import StrategicAlignmentScorer
+    from urbanomy.land_value import StrategicAlignmentScorer
 
     class LLM:
         def invoke(self, _):

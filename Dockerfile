@@ -5,6 +5,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 COPY pyproject.toml README.md ./
+COPY urbanomy ./urbanomy
 COPY urbanomy_agent ./urbanomy_agent
 COPY urbanomy_mcp ./urbanomy_mcp
 RUN pip install --no-cache-dir .

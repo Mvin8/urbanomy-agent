@@ -40,4 +40,4 @@ testpaths = ["tests"]
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["urbanomy_agent*", "urbanomy_mcp*"]
+include = ["urbanomy", "urbanomy.*", "urbanomy_agent*", "urbanomy_mcp*"]

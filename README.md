@@ -121,7 +121,7 @@ python -m urbanomy_agent
 | A2A Agent Card | `http://localhost:8080/.well-known/agent-card.json` |
 | Проверка доступности | `http://localhost:8080/health` |
 
-После установки также доступна команда `urbanomy-agent`; прежнее имя `urbanomy-server` сохранено. HTTP-сервис предоставляет протоколы для клиентов; отдельного веб-интерфейса карты в проекте нет.
+После установки также доступна команда `urbanomy-agent`. HTTP-сервис предоставляет протоколы для клиентов, отдельного веб-интерфейса карты в проекте нет.
 
 ### 4. Проверка с настоящими данными
 
@@ -349,7 +349,10 @@ python scripts/smoke_server.py --compute
 
 ```text
 .
-├── urbanomy_agent/
+├── urbanomy/                # Расчётная библиотека
+│   ├── land_value/          # Стоимость земли, сценарии и NSGA-II
+│   └── investment/          # Инвестиционные показатели
+├── urbanomy_agent/          # A2A и сервис выполнения расчётов
 │   ├── __main__.py          # Запуск общего HTTP-сервера
 │   ├── server.py            # FastAPI, авторизация, жизненный цикл
 │   ├── a2a.py               # Agent Card и A2A-задачи
@@ -359,9 +362,7 @@ python scripts/smoke_server.py --compute
 │   ├── data.py              # Каталог и подготовка геоданных
 │   ├── engine.py            # Оценка и оптимизация
 │   ├── settings.py          # Настройки сервера
-│   ├── llm.py               # Подключение LLM
-│   ├── land_value/          # Стоимость земли, сценарии и NSGA-II
-│   └── investment/          # Инвестиционные показатели
+│   └── llm.py               # Подключение LLM
 ├── urbanomy_mcp/
 │   ├── __main__.py          # Запуск MCP через stdio
 │   ├── server.py            # Создание и настройка MCP-сервера
@@ -377,6 +378,17 @@ python scripts/smoke_server.py --compute
 ├── compose.yaml
 └── RUN.md                  # Краткая инструкция запуска
 ```
+
+Расчётную библиотеку можно импортировать напрямую из Python:
+
+```python
+from urbanomy.land_value import LandPriceEstimator, ScenarioTEPModifier
+from urbanomy.investment import calculate_investment_metrics
+```
+
+Три пакета устанавливаются одной командой `pip install -e .`; отдельная публикация
+библиотеки пока не выделена. Импорты `urbanomy_agent.land_value` и
+`urbanomy_agent.investment` заменены на `urbanomy.land_value` и `urbanomy.investment`.
 
 Для ноутбука установите дополнительные зависимости:
 

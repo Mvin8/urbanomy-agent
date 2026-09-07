@@ -1,1 +1,1 @@
-"""Urbanomy calculations and A2A agent. Importing the package starts no services."""
+"""Urbanomy A2A agent and calculation service. Importing starts no services."""

@@ -32,7 +32,7 @@ class DatasetRegistry:
         import geopandas as gpd
         import numpy as np
         import pandas as pd
-        from urbanomy_agent.land_value.constants import CATEGORICAL_FEATURES, ORIGINAL_FEATURES
+        from urbanomy.land_value.constants import CATEGORICAL_FEATURES, ORIGINAL_FEATURES
 
         blocks_path, _ = self.paths(dataset_id)
         blocks = gpd.read_file(blocks_path)
