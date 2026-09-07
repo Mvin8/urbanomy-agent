@@ -1,0 +1,24 @@
+services:
+  urbanomy:
+    build: .
+    ports:
+      - "127.0.0.1:8080:8080"
+    env_file:
+      - .env
+    environment:
+      URBANOMY_HOST: 0.0.0.0
+      URBANOMY_PORT: 8080
+      URBANOMY_DATASETS: /app/data/datasets.json
+      URBANOMY_OUTPUT_DIR: /app/outputs
+    volumes:
+      - ./data:/app/data:ro
+      - urbanomy-results:/app/outputs
+    init: true
+    stop_grace_period: 15s
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+volumes:
+  urbanomy-results:

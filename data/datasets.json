@@ -1,0 +1,8 @@
+{
+  "baseline": {
+    "description": "Кварталы из data; исходные id сохраняются. Некорректные геометрии исправляются; вырожденные кварталы исключаются с записью в provenance.",
+    "geometry_policy": "repair_and_drop_non_polygon",
+    "blocks_path": "blocks_agg_with_indicators.geojson",
+    "model_path": "catboost_land_value_no_services.cbm"
+  }
+}

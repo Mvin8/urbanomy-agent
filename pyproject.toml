@@ -3,33 +3,41 @@ requires = ["setuptools>=64.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "urbanomy-paper"
+name = "urbanomy-agent"
 version = "0.1.0"
-description = "Reproducible notebook and minimal Urbanomy code for the paper experiments"
-requires-python = ">=3.10,<=3.13"
+description = "Land valuation and district optimization with MCP and A2A interfaces"
+requires-python = ">=3.11,<3.14"
 dependencies = [
-    "blocksnet[full,ipynb]==1.0.0.a9",
+    "blocksnet==1.0.0.a9",
     "catboost",
     "geopandas>=1.0.0,<2.0.0",
-    "ipykernel",
-    "jupyter",
-    "langchain>=0.3,<0.4",
-    "langchain-core>=0.3,<0.4",
     "langchain-openai>=0.2,<0.4",
-    "langgraph>=0.2,<1.1",
     "libpysal",
     "matplotlib",
     "numpy",
     "pandas>=2.2.3",
-    "pillow",
     "pymoo",
     "python-dotenv>=1,<2",
     "shapely",
+    "mcp[cli]==1.16.0",
+    "a2a-sdk==1.1.1",
+    "fastapi>=0.115,<1",
+    "uvicorn>=0.31,<1",
+    "pydantic>=2.11,<3",
 ]
 
-[tool.setuptools.package-dir]
-"" = "src"
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "httpx>=0.27,<1", "jsonschema>=4,<5"]
+notebook = ["jupyter", "ipykernel", "pillow"]
+
+[project.scripts]
+urbanomy-agent = "urbanomy_agent.server:main"
+urbanomy-server = "urbanomy_agent.server:main"
+urbanomy-mcp = "urbanomy_mcp.__main__:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
 
 [tool.setuptools.packages.find]
-where = ["src"]
-include = ["urbanomy*"]
+where = ["."]
+include = ["urbanomy_agent*", "urbanomy_mcp*"]
