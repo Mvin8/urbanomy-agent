@@ -6,7 +6,7 @@
 Передача одного пути к файлу не подразумевает, что агент сможет его прочитать.
 
 - `*.request.json` — аргументы MCP-инструмента.
-- `*.a2a.json` — те же аргументы внутри A2A SendMessage; returnImmediately=true.
+- `*.a2a.json` — те же аргументы внутри A2A SendMessage. ReturnImmediately=true.
 - `estimate.response.json`, `optimize.response.json` — реальные ответы HTTP MCP.
 - `estimate.geojson`, `optimize.geojson` — реальные геоданные этих ответов.
 - `*.run.json` — длительность HTTP-прогона и точный запрос.
