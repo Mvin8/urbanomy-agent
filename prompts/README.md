@@ -1,38 +1,38 @@
-# Connecting the prompts
+# Подключение промптов
 
-| File | Where to use it |
+| Файл | Куда передавать |
 |---|---|
-| [urbanomy-specialist.md](urbanomy-specialist.md) | System instructions for an external LLM specialist with Urbanomy MCP tools |
-| [urbanomy-routing.md](urbanomy-routing.md) | An instruction section for the main orchestrator with a connected delegation or A2A tool |
-| [optimizer-strategy.txt](optimizer-strategy.txt) | Contents of the `strategy` field in a specific optimization request |
+| [urbanomy-specialist.md](urbanomy-specialist.md) | В системные инструкции внешнего LLM-специалиста с MCP-инструментами Urbanomy |
+| [urbanomy-routing.md](urbanomy-routing.md) | Как раздел инструкций главного оркестратора с подключённым инструментом делегирования или A2A |
+| [optimizer-strategy.txt](optimizer-strategy.txt) | Содержимое в поле `strategy` конкретного запроса оптимизации |
 
-The server does not load these files automatically. The Urbanomy A2A service executes
-structured calculation requests; it does not support installing the specialist prompt.
-The specialist prompt is for an external agent that operates the MCP tools.
+Сервер не загружает эти файлы автоматически. Сам A2A-сервис Urbanomy выполняет
+структурированные расчётные запросы; установка промпта специалиста в него не предусмотрена.
+Промпт специалиста относится к внешнему агенту, управляющему MCP-инструментами.
 
-When configuring the orchestrator, bind the specialist to an actual delegation tool:
-its name and schema come from your runtime configuration. This repository has no verified
-Synapse delegation tool name, so none is specified here. Describe the economic tasks
-and the procedure for continuing jobs in the connected tool's description.
-The router must have access to that schema, not just text saying that a specialist exists.
+При настройке оркестратора свяжите специалиста с реальным инструментом делегирования:
+имя и схема поступают из конфигурации вашей среды. В репозитории нет подтверждённого
+имени такого инструмента Synapse; здесь оно намеренно не задано. В описании подключённого
+инструмента укажите экономические задачи, которые он выполняет, и способ продолжения задач.
+Маршрутизатор должен видеть именно эту схему, а не только текст о существовании специалиста.
 
-The runtime must retain task parameters, mode, transport, returned ID, and status across
-turns; schedule polling; and bound the total waiting time. The recommended polling
-interval for long jobs is 10–15 seconds. If resumption is unavailable, the agent returns
-the current status and ID without promising a later notification.
-This repository does not implement the external orchestrator's scheduler.
+Среда выполнения должна сохранять параметры задачи, режим, транспорт, полученный ID
+и статус между ходами; планировать опрос и ограничивать общее время ожидания.
+Рекомендуемый интервал для долгих задач — 10–15 секунд. Если возобновления нет,
+агент возвращает текущий статус и ID без обещания будущего уведомления.
+В этом репозитории не реализуется планировщик внешнего оркестратора.
 
-Supply demo parameters separately from the [examples](../examples/integration/README.md).
-The `strategy` field requires the actual text, not a file path. JSON requests contain
-a copy for standalone use; when changing the strategy, synchronize both optimization
-MCP requests and their A2A envelopes. Saved results from previous runs are historical
-records and must not be edited retroactively.
+Демо-параметры передавайте отдельно из [примеров](../examples/integration/README.md).
+В `strategy` нужен сам текст, а не путь к файлу. JSON-запросы содержат его копию
+для самостоятельного использования; при изменении стратегии синхронизируйте оба
+MCP-запроса оптимизации и их A2A-конверты. Сохранённые результаты прошлых прогонов
+являются историческими данными и не редактируются задним числом.
 
-The scorer's response format (`{"score": number}`), the 0–1 range, and error handling
-are defined in code. The user strategy defines the evaluation criterion.
-New scoring scales, group weights, and social indicators require domain agreement;
-this package does not invent them.
+Технический формат ответа scorer (`{"score": число}`), диапазон 0–1 и обработка
+ошибок задаются в коде. Пользовательская стратегия определяет критерий оценки.
+Новые шкалы, веса групп и социальные показатели должны быть согласованы предметно;
+этот пакет их не выдумывает.
 
-Run the [agent behavior evaluation cases](../examples/integration/agent-evals.md)
-separately; do not include them in system instructions. API tests and saved calculations
-do not evaluate how an LLM selects tools.
+[Сценарии проверки поведения](../examples/integration/agent-evals.md) запускаются
+отдельно и не включаются в системные инструкции. Тесты API и сохранённые расчёты
+не являются проверкой того, как LLM выбирает инструменты.
