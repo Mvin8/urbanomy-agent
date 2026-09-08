@@ -29,7 +29,7 @@ async def render_documents():
     finally:
         service.jobs.close()
     catalog = ["# MCP-инструменты\n",
-               "Автогенерация: `python scripts/generate_docs.py`; проверка: `--check`.\n",
+               "Автогенерация: `python scripts/generate_docs.py`. Проверка: `--check`.\n",
                "[Примеры и правила](tool_contract.md) · [Полные JSON-схемы](mcp_schemas.json)\n",
                "Транспорт: Streamable HTTP `/mcp` или stdio `python -m urbanomy_mcp`.\n",
                "Обязательные аргументы выделены **жирным**.\n"]
@@ -46,7 +46,7 @@ async def render_documents():
     card = MessageToDict(build_card(settings))
     agent = """# A2A-агент
 
-Автогенерация: `python scripts/generate_docs.py`; проверка: `--check`.
+Автогенерация: `python scripts/generate_docs.py`. Проверка: `--check`.
 
 - Протокол: **A2A 1.0**, JSON-RPC `/a2a`, заголовок `A2A-Version: 1.0`.
 - Карточка: `/.well-known/agent-card.json`.

@@ -1,6 +1,6 @@
 # MCP-инструменты
 
-Автогенерация: `python scripts/generate_docs.py`; проверка: `--check`.
+Автогенерация: `python scripts/generate_docs.py`. Проверка: `--check`.
 
 [Примеры и правила](tool_contract.md) · [Полные JSON-схемы](mcp_schemas.json)
 

@@ -1,6 +1,6 @@
 # A2A-агент
 
-Автогенерация: `python scripts/generate_docs.py`; проверка: `--check`.
+Автогенерация: `python scripts/generate_docs.py`. Проверка: `--check`.
 
 - Протокол: **A2A 1.0**, JSON-RPC `/a2a`, заголовок `A2A-Version: 1.0`.
 - Карточка: `/.well-known/agent-card.json`.
