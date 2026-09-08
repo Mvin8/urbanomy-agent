@@ -168,34 +168,76 @@ urbanomy-agent/
 Для другого сценария используйте его ID и ID квартала из `list_blocks`.
 Это MCP-вызовы, а не отдельные HTTP-маршруты.
 
-Для оптимизации сначала вызовите `get_optimization_options(scenario_id, target_id)`:
-он возвращает исходные показатели, единицы и допустимые параметры.
-Пример аргументов `start_district_optimization`:
+### Оптимизация квартала
+
+Сначала вызовите `get_optimization_options` с `scenario_id` и `target_id` выбранного
+квартала. Он возвращает исходные показатели, единицы и допустимые параметры.
+Затем передайте `start_district_optimization` эталонный запрос:
 
 ```json
 {
   "scenario_id": "baseline",
   "target_id": 86,
   "constraints_profile": "test",
-  "constraints": {"l": {"min": 3, "max": 6}},
-  "strategy": "Предпочитать смешанное жилое и деловое использование",
+  "constraints": {
+    "l": {
+      "min": 3,
+      "max": 6
+    }
+  },
+  "strategy": "Evaluate the presented scenario based on the criterion of balancing the interests of various land users.\nAnalyze potential conflicts between residents, pedestrians, drivers, business owners, visitors, employees, seniors, and families with children.",
   "use_llm": false,
-  "pop_size": 20,
-  "n_gen": 30,
+  "pop_size": 4,
+  "n_gen": 3,
   "seed": 42
 }
 ```
 
+Текст `strategy` соответствует [эталонной стратегии](prompts/optimizer-strategy.txt)
+баланса интересов землепользователей. В этом примере `use_llm=false`, поэтому поиск
+учитывает две экономические цели: прирост стоимости земли всего сценария и NPV
+инвестора выбранного квартала. Стратегия сохраняется, но не оценивается.
+
 Профиль `test` задаёт пятно застройки от 1 м² до 10% площади квартала,
 этажность 1–10, MXI 0,1–1 и семь долей землепользования 0–1 с суммой 1.
-Явные `constraints` заменяют границы профиля по параметрам. В примере этажность
+Явные `constraints` заменяют границы профиля по параметрам. Здесь этажность
 сужена до 3–6. Без профиля неуказанные параметры фиксируются на исходных значениях.
-Нужен профиль или непустой `constraints`.
 
-При `use_llm=false` стратегия сохраняется, но не влияет на поиск.
-Для оценки стратегии настройте LLM и передайте `use_llm: true`.
-В A2A соответствующие операции — `estimate_land_value` и `optimize_district`.
-Пример JSON-RPC приведён в [контракте](docs/tool_contract.md#подключение-по-a2a).
+
+`pop_size=4`, `n_gen=3` и `seed=42` задают короткое воспроизводимое демо.
+Такой бюджет проверяет интеграцию, но не подтверждает сходимость поиска.
+Для более подробного исследования задайте `pop_size=20`, `n_gen=30`.
+
+Старт возвращает `job_id`. Проверяйте `get_job_status`, а после `completed`
+получите `get_job_result`. Для карты используйте `get_job_geojson`.
+Результат содержит варианты Парето, фактические ограничения и экономические показатели.
+[Сохранённый ответ без LLM](examples/integration/optimize.response.json) и
+[GeoJSON вариантов](examples/integration/optimize.geojson) доступны в примерах.
+
+При запущенном HTTP-сервере повторите демо из активированного окружения:
+
+```bash
+python scripts/replay_integration.py optimize
+```
+
+### Оценка стратегии с LLM
+
+Настройте `OPENAI_API_KEY`, `URBANOMY_LLM_MODEL` и при необходимости `OPENAI_BASE_URL`
+на сервере. Перезапустите сервер и используйте тот же запрос с `use_llm=true`.
+Готовый вариант — [optimize-llm.request.json](examples/integration/optimize-llm.request.json).
+
+```bash
+python scripts/replay_integration.py optimize-llm
+```
+
+В этом режиме `llm_score` добавляет оценку соответствия стратегии. Это эвристическая
+оценка по переданным показателям, а не измерение мнений жителей или реальных конфликтов.
+Пример с LLM подготовлен, но реальный прогон через провайдера пока не выполнен.
+
+Для A2A операция оптимизации называется `optimize_district`.
+Готовые запросы `SendMessage`: [без LLM](examples/integration/optimize.a2a.json) и
+[с LLM](examples/integration/optimize-llm.a2a.json).
+Данные, критерии приёмки и локальные замеры описаны в [интеграционном демо](docs/integration.md).
 
 ## Финальный ответ
 
