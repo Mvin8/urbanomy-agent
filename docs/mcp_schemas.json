@@ -1,0 +1,333 @@
+{
+  "cancel_job": {
+    "description": "Stop the job's worker process. Canceling one job does not stop another.",
+    "inputSchema": {
+      "properties": {
+        "job_id": {
+          "title": "Job Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "job_id"
+      ],
+      "title": "cancel_jobArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "additionalProperties": true,
+      "title": "cancel_jobDictOutput",
+      "type": "object"
+    }
+  },
+  "estimate_land_value": {
+    "description": "Start land valuation with the pretrained CatBoost model (no LLM). Returns job_id; poll get_job_status. Select scenario_id from list_scenarios. project_id is metadata only.",
+    "inputSchema": {
+      "properties": {
+        "project_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Project Id"
+        },
+        "scenario_id": {
+          "title": "Scenario Id",
+          "type": "string"
+        },
+        "target_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Target Id"
+        }
+      },
+      "required": [
+        "scenario_id",
+        "target_id"
+      ],
+      "title": "estimate_land_valueArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "additionalProperties": true,
+      "title": "estimate_land_valueDictOutput",
+      "type": "object"
+    }
+  },
+  "get_job_geojson": {
+    "description": "Get WGS84 GeoJSON: valuation for all blocks or alternatives for the selected block.",
+    "inputSchema": {
+      "properties": {
+        "job_id": {
+          "title": "Job Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "job_id"
+      ],
+      "title": "get_job_geojsonArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "additionalProperties": true,
+      "title": "get_job_geojsonDictOutput",
+      "type": "object"
+    }
+  },
+  "get_job_result": {
+    "description": "Get completed valuation or Pareto scenarios, summary, effective constraints and provenance.",
+    "inputSchema": {
+      "properties": {
+        "job_id": {
+          "title": "Job Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "job_id"
+      ],
+      "title": "get_job_resultArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "additionalProperties": true,
+      "title": "get_job_resultDictOutput",
+      "type": "object"
+    }
+  },
+  "get_job_status": {
+    "description": "Get working/completed/failed/canceled state and evaluation progress. Poll every few seconds.",
+    "inputSchema": {
+      "properties": {
+        "job_id": {
+          "title": "Job Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "job_id"
+      ],
+      "title": "get_job_statusArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "additionalProperties": true,
+      "title": "get_job_statusDictOutput",
+      "type": "object"
+    }
+  },
+  "get_optimization_options": {
+    "description": "Get target geometry, indicators, supported constraint names, units and physical limits. Select scenario_id from list_scenarios.",
+    "inputSchema": {
+      "properties": {
+        "scenario_id": {
+          "title": "Scenario Id",
+          "type": "string"
+        },
+        "target_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Target Id"
+        }
+      },
+      "required": [
+        "scenario_id",
+        "target_id"
+      ],
+      "title": "get_optimization_optionsArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "additionalProperties": true,
+      "title": "get_optimization_optionsDictOutput",
+      "type": "object"
+    }
+  },
+  "list_blocks": {
+    "description": "List block ids and baseline properties, in pages of up to 200. Never invent a block id. Select scenario_id from list_scenarios.",
+    "inputSchema": {
+      "properties": {
+        "limit": {
+          "default": 50,
+          "title": "Limit",
+          "type": "integer"
+        },
+        "offset": {
+          "default": 0,
+          "title": "Offset",
+          "type": "integer"
+        },
+        "scenario_id": {
+          "title": "Scenario Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "scenario_id"
+      ],
+      "title": "list_blocksArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "additionalProperties": true,
+      "title": "list_blocksDictOutput",
+      "type": "object"
+    }
+  },
+  "list_scenarios": {
+    "description": "List prepared scenario directories under DATA_DIR. Remote callers cannot open arbitrary server paths.",
+    "inputSchema": {
+      "properties": {},
+      "title": "list_scenariosArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "additionalProperties": true,
+      "title": "list_scenariosDictOutput",
+      "type": "object"
+    }
+  },
+  "start_district_optimization": {
+    "description": "Start NSGA-II with hard bounds and an LLM strategy score. Without a profile, omitted variables stay at baseline.\n        Profile \"test\": footprint 1 m² to 10% of site area, floors 1–10, MXI 0.1–1, all shares 0–1.\n        Explicit constraints replace profile bounds per parameter. Supply constraints or a profile.\n        Select scenario_id from list_scenarios. project_id is metadata only.\n        Get options first. strategy contains preferences; constraints contain hard numeric requirements.\n        use_llm=false runs two economic objectives only. Returns job_id; use status/result/cancel tools.\n        ",
+    "inputSchema": {
+      "$defs": {
+        "Bounds": {
+          "additionalProperties": false,
+          "properties": {
+            "max": {
+              "title": "Max",
+              "type": "number"
+            },
+            "min": {
+              "title": "Min",
+              "type": "number"
+            },
+            "type": {
+              "const": "float",
+              "default": "float",
+              "title": "Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "min",
+            "max"
+          ],
+          "title": "Bounds",
+          "type": "object"
+        }
+      },
+      "properties": {
+        "constraints": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "$ref": "#/$defs/Bounds"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Constraints"
+        },
+        "constraints_profile": {
+          "anyOf": [
+            {
+              "const": "test",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Constraints Profile"
+        },
+        "n_gen": {
+          "default": 20,
+          "title": "N Gen",
+          "type": "integer"
+        },
+        "pop_size": {
+          "default": 20,
+          "title": "Pop Size",
+          "type": "integer"
+        },
+        "project_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Project Id"
+        },
+        "scenario_id": {
+          "title": "Scenario Id",
+          "type": "string"
+        },
+        "seed": {
+          "default": 42,
+          "title": "Seed",
+          "type": "integer"
+        },
+        "strategy": {
+          "title": "Strategy",
+          "type": "string"
+        },
+        "target_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Target Id"
+        },
+        "use_llm": {
+          "default": true,
+          "title": "Use Llm",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "scenario_id",
+        "target_id",
+        "strategy"
+      ],
+      "title": "start_district_optimizationArguments",
+      "type": "object"
+    },
+    "outputSchema": {
+      "additionalProperties": true,
+      "title": "start_district_optimizationDictOutput",
+      "type": "object"
+    }
+  }
+}

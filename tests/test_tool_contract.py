@@ -12,7 +12,7 @@ from tests.helpers import request
     {"constraints": {"unknown": {"min": 1, "max": 8}}},
     {"constraints": {"l": {"min": 1, "max": float('inf')}}},
     {"constraints": {"recreation": {"min": 0, "max": 20}}},
-    {"dataset_id": "../private"}, {"target_id": True}, {"strategy": " "}, {"n_gen": 0},
+    {"scenario_id": "../private"}, {"target_id": True}, {"strategy": " "}, {"n_gen": 0},
 ])
 def test_invalid_inputs(change):
     payload = request().model_dump()
@@ -24,7 +24,7 @@ def test_invalid_inputs(change):
 
 def test_prompt_alias_and_structured_precedence():
     message = ParseDict({"messageId": "1", "role": "ROLE_USER", "parts": [
-        {"text": "different strategy"}, {"data": {"operation": "optimize_district", "dataset_id": "test", "target_id": 86,
+        {"text": "different strategy"}, {"data": {"operation": "optimize_district", "scenario_id": "test", "target_id": 86,
         "prompt": "explicit strategy", "constraints_json": '{"l":{"min":1,"max":8}}', "n_gen": 1}},
     ]}, Message())
     _, payload = parse_input(message)
@@ -39,7 +39,7 @@ def test_prompt_alias_and_structured_precedence():
     [{"data": {"operation": "estimate_land_value"}}, {"data": {"operation": "optimize_district"}}],
     [{"data": [1, 2]}],
     [{"url": "https://example.invalid/data.geojson"}],
-    [{"data": {"operation": "optimize_district", "dataset_id": "test", "target_id": 1, "unknown": True}}],
+    [{"data": {"operation": "optimize_district", "scenario_id": "test", "target_id": 1, "unknown": True}}],
 ])
 def test_invalid_a2a_parts_are_rejected(parts):
     message = ParseDict({"messageId": "1", "role": "ROLE_USER", "parts": parts}, Message())
@@ -62,3 +62,18 @@ def test_conflicting_prompt_aliases_are_not_silently_chosen():
     payload["prompt"] = "Different strategy"
     with pytest.raises(ValidationError):
         OptimizationRequest.model_validate(payload)
+
+
+def test_old_dataset_field_is_rejected():
+    from urbanomy_agent.schemas import EstimateRequest
+    with pytest.raises(ValidationError):
+        EstimateRequest.model_validate({"dataset_id": "baseline", "target_id": 86})
+
+
+def test_a2a_scenario_and_project_label():
+    message = ParseDict({"messageId": "scenario", "role": "ROLE_USER", "parts": [{"data": {
+        "operation": "estimate_land_value", "scenario_id": "test", "target_id": "0",
+        "project_id": "project-1"}}]}, Message())
+    _, payload = parse_input(message)
+    assert payload["scenario_id"] == "test"
+    assert payload["project_id"] == "project-1"

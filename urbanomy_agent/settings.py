@@ -5,7 +5,7 @@ from pathlib import Path
 
 @dataclass(frozen=True)
 class Settings:
-    datasets_file: Path = field(default_factory=lambda: Path(os.getenv("URBANOMY_DATASETS", "data/datasets.json")).resolve())
+    data_dir: Path = field(default_factory=lambda: Path(os.getenv("DATA_DIR", "data")).resolve())
     output_dir: Path = field(default_factory=lambda: Path(os.getenv("URBANOMY_OUTPUT_DIR", "outputs/server")).resolve())
     host: str = field(default_factory=lambda: os.getenv("URBANOMY_HOST", "127.0.0.1"))
     port: int = field(default_factory=lambda: int(os.getenv("URBANOMY_PORT", "8080")))

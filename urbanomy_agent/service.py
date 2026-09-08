@@ -1,4 +1,4 @@
-from .data import DatasetRegistry, target_row
+from .data import ScenarioRegistry, target_row
 from .jobs import JobManager
 from .schemas import DERIVED, INDEPENDENT, LAND_USES, EstimateRequest, OptimizationRequest
 
@@ -6,26 +6,26 @@ from .schemas import DERIVED, INDEPENDENT, LAND_USES, EstimateRequest, Optimizat
 class UrbanomyService:
     def __init__(self, settings, jobs=None):
         self.settings = settings
-        self.registry = DatasetRegistry(settings.datasets_file)
+        self.registry = ScenarioRegistry(settings.data_dir)
         self.jobs = jobs if jobs is not None else JobManager(settings)
 
-    def list_blocks(self, dataset_id, offset=0, limit=50):
+    def list_blocks(self, scenario_id, offset=0, limit=50):
         if not 0 <= offset or not 1 <= limit <= 200:
             raise ValueError("offset >= 0 and 1 <= limit <= 200 are required.")
         import json
 
-        blocks = self.registry.blocks(dataset_id)
+        blocks = self.registry.blocks(scenario_id)
         columns = ["id", "site_area", "land_use", "footprint_area", "l"]
-        return {"dataset_id": dataset_id, "total": len(blocks), "offset": offset,
+        return {"scenario_id": scenario_id, "total": len(blocks), "offset": offset,
                 "blocks": json.loads(blocks.iloc[offset:offset + limit][columns].to_json(orient="records"))}
 
-    def options(self, dataset_id, target_id):
+    def options(self, scenario_id, target_id):
         import json
 
-        blocks = self.registry.blocks(dataset_id)
+        blocks = self.registry.blocks(scenario_id)
         row = target_row(blocks, target_id)
         geometry = json.loads(blocks.loc[[row.name]].to_crs(4326).to_json())["features"][0]["geometry"]
-        return {"dataset_id": dataset_id, "target_id": target_id, "geometry": geometry,
+        return {"scenario_id": scenario_id, "target_id": target_id, "geometry": geometry,
                 "baseline": json.loads(row[list(INDEPENDENT + DERIVED)].to_json()),
                 "independent_parameters": list(INDEPENDENT), "derived_constraints": list(DERIVED),
                 "units": {**{k: "fraction [0,1]" for k in (*LAND_USES, "mxi", "gsi")},
@@ -42,5 +42,5 @@ class UrbanomyService:
             raise ValueError("Unknown operation.")
         schema = OptimizationRequest if operation == "optimize_district" else EstimateRequest
         request = schema.model_validate(payload)
-        self.registry.paths(request.dataset_id)
+        self.registry.paths(request.scenario_id)
         return self.jobs.submit(operation, request, owner)

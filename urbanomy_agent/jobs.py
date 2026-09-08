@@ -20,7 +20,7 @@ def write_json(path, value):
     temporary.replace(path)
 
 
-def worker(operation, payload, manifest, directory):
+def worker(operation, payload, data_dir, directory):
     directory = Path(directory)
     with (directory / "worker.log").open("w") as log, redirect_stdout(log), redirect_stderr(log):
         # Native scientific libraries may write directly to file descriptors.
@@ -31,7 +31,7 @@ def worker(operation, payload, manifest, directory):
             from .engine import execute
 
             schema = OptimizationRequest if operation == "optimize_district" else EstimateRequest
-            result, spatial = execute(operation, schema.model_validate(payload), Path(manifest),
+            result, spatial = execute(operation, schema.model_validate(payload), Path(data_dir),
                                       lambda progress: write_json(directory / "progress.json", progress))
             if hasattr(spatial, "to_crs"):
                 spatial = json.loads(spatial.to_crs(4326).to_json())
@@ -40,7 +40,7 @@ def worker(operation, payload, manifest, directory):
         except Exception as exc:
             traceback.print_exc()
             message = str(exc) if isinstance(exc, ValueError) else "Calculation failed. See the server worker log."
-            write_json(directory / "error.json", {"code": "CALCULATION_FAILED", "message": message})
+            write_json(directory / "error.json", {"code": getattr(exc, "code", "CALCULATION_FAILED"), "message": message})
 
 
 class JobManager:
@@ -65,7 +65,7 @@ class JobManager:
             payload = request.model_dump(mode="json")
             write_json(directory / "request.json", {"operation": operation, **payload})
             process = multiprocessing.get_context("spawn").Process(
-                target=self.runner, args=(operation, payload, str(self.settings.datasets_file), str(directory)), daemon=True,
+                target=self.runner, args=(operation, payload, str(self.settings.data_dir), str(directory)), daemon=True,
             )
             record = {"job_id": job_id, "operation": operation, "status": "working", "owner": owner,
                       "directory": directory, "process": process, "started": time.monotonic()}

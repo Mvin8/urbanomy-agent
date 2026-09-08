@@ -4,7 +4,7 @@ from typing import Annotated, Literal
 from pydantic import AliasChoices, BaseModel, ConfigDict, Field, StrictInt, StrictStr, model_validator
 
 BlockId = StrictInt | StrictStr
-DatasetId = Annotated[str, Field(pattern=r"^[a-zA-Z0-9_-]{1,64}$")]
+ScenarioId = Annotated[str, Field(pattern=r"^[a-zA-Z0-9_-]{1,64}$")]
 LAND_USES = ("residential", "business", "recreation", "industrial", "transport", "special", "agriculture")
 INDEPENDENT = ("footprint_area", "l", *LAND_USES)
 DERIVED = ("mxi", "fsi", "gsi", "build_floor_area", "living_area", "non_living_area", "population")
@@ -27,12 +27,14 @@ class Bounds(InputModel):
 
 
 class EstimateRequest(InputModel):
-    dataset_id: DatasetId
+    scenario_id: ScenarioId
     target_id: BlockId
+    project_id: ScenarioId | None = None
 
 
 class OptimizationRequest(EstimateRequest):
-    constraints: dict[str, Bounds] = Field(min_length=1)
+    constraints: dict[str, Bounds] = Field(default_factory=dict)
+    constraints_profile: Literal["test"] | None = None
     strategy: str = Field(min_length=1, max_length=12000, validation_alias=AliasChoices("strategy", "prompt"))
     use_llm: bool = True
     pop_size: int = Field(default=20, ge=4, le=100, strict=True)
@@ -41,6 +43,8 @@ class OptimizationRequest(EstimateRequest):
 
     @model_validator(mode="after")
     def known_constraints(self):
+        if not self.constraints and self.constraints_profile is None:
+            raise ValueError("Provide non-empty constraints or constraints_profile.")
         unknown = self.constraints.keys() - set(INDEPENDENT + DERIVED)
         if unknown:
             raise ValueError(f"Unsupported constraints: {sorted(unknown)}")

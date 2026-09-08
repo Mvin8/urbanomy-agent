@@ -16,13 +16,9 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def documentation_settings():
     """Deterministic public example, independent of local URLs and credentials."""
-    return Settings(datasets_file=ROOT / "data/datasets.json", output_dir=ROOT / "outputs/docs",
+    return Settings(data_dir=ROOT / "data", output_dir=ROOT / "outputs/docs",
                     host="127.0.0.1", port=8080, public_url="http://localhost:8080",
                     token="", max_jobs=2, timeout_seconds=3600)
-
-
-def json_block(value):
-    return "```json\n" + json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n```\n"
 
 
 async def render_documents():
@@ -32,30 +28,41 @@ async def render_documents():
         tools = await build_mcp(service).list_tools()
     finally:
         service.jobs.close()
-    catalog = ["# Каталог MCP-инструментов\n",
-               "Генерируется из `urbanomy_mcp/tools.py`. Не редактировать руками.\n",
-               "Обновление: `python scripts/generate_docs.py`. Проверка без записи: `--check`.\n",
-               "[Контракт и примеры вызовов](tool_contract.md) · [Индекс](README.md)\n",
-               f"Опубликовано инструментов: **{len(tools)}**.\n"]
+    catalog = ["# MCP-инструменты\n",
+               "Автогенерация: `python scripts/generate_docs.py`; проверка: `--check`.\n",
+               "[Примеры и правила](tool_contract.md) · [Полные JSON-схемы](mcp_schemas.json)\n",
+               "Транспорт: Streamable HTTP `/mcp` или stdio `python -m urbanomy_mcp`.\n",
+               "Обязательные аргументы выделены **жирным**.\n"]
+    schemas = {}
     for tool in tools:
-        catalog.extend([f"## `{tool.name}`\n", (tool.description or "") + "\n",
-                        "Входная JSON Schema:\n", json_block(tool.inputSchema),
-                        "Выходная JSON Schema:\n", json_block(tool.outputSchema)])
+        schema = tool.inputSchema
+        required = schema.get("required", [])
+        args = [f"**`{name}`**" if name in required else f"`{name}`"
+                for name in schema.get("properties", {})]
+        catalog.extend([f"## `{tool.name}`\n", (tool.description or "").split(". ")[0].rstrip(".") + ".\n",
+                        "Аргументы: " + (", ".join(args) if args else "нет") + ".\n"])
+        schemas[tool.name] = {"description": tool.description, "inputSchema": schema,
+                              "outputSchema": tool.outputSchema}
     card = MessageToDict(build_card(settings))
-    agent = ["# Карточка A2A-агента\n",
-             "Генерируется из `urbanomy_agent/a2a.py`. Не редактировать руками.\n",
-             "Обновление: `python scripts/generate_docs.py`. Проверка без записи: `--check`.\n",
-             "[Подключение и запросы](tool_contract.md#a2a-и-codesynapse) · [Развёртывание](deployment.md)\n",
-             "Пример для `http://localhost:8080`, без авторизации. Реальная карточка доступна по "
-             "`/.well-known/agent-card.json`: URL зависит от `URBANOMY_PUBLIC_URL`, а при заданном "
-             "`URBANOMY_API_TOKEN` она дополнительно объявляет Bearer security scheme. Сам токен в карточку не попадает.\n",
-             "## Agent Card\n", json_block(card), "## Навыки\n"]
-    for skill in card["skills"]:
-        agent.extend([f"### `{skill['id']}` — {skill['name']}\n", skill["description"] + "\n"])
-    agent.append("## Совместимость\n\nИспользуется A2A **1.0**, SDK **1.1.1**. Для JSON-RPC нужен заголовок "
-                 "`A2A-Version: 1.0`. Проверки в `tests/test_codesynapse_contract.py` используют внешнюю "
-                 "схему Codesynapse через `A2A_CONTRACTS_DIR`; копия схемы в проекте не хранится.\n")
-    return {"mcp_tool_catalog.md": "\n".join(catalog), "a2a_agent_card.md": "\n".join(agent)}
+    agent = """# A2A-агент
+
+Автогенерация: `python scripts/generate_docs.py`; проверка: `--check`.
+
+- Протокол: **A2A 1.0**, JSON-RPC `/a2a`, заголовок `A2A-Version: 1.0`.
+- Карточка: `/.well-known/agent-card.json`.
+- Операции: `estimate_land_value`, `optimize_district`.
+- Долгие задачи: `GetTask`, `CancelTask`, поток `SendStreamingMessage`.
+- Артефакты: сводка, JSON с результатами и GeoJSON.
+
+[Запросы и статусы](tool_contract.md#подключение-по-a2a) · [Пример Agent Card](a2a_card.json)
+
+JSON-пример использует `http://localhost:8080` без авторизации. Реальная карточка
+учитывает `URBANOMY_PUBLIC_URL` и настройку Bearer token.
+"""
+    return {"mcp_tool_catalog.md": "\n".join(catalog), "a2a_agent_card.md": agent,
+            "mcp_schemas.json": json.dumps(schemas, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+            "a2a_card.json": json.dumps(card, ensure_ascii=False, indent=2, sort_keys=True) + "\n"}
+
 
 
 def main():

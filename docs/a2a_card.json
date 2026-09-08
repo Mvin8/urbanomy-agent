@@ -1,0 +1,115 @@
+{
+  "capabilities": {
+    "extensions": [
+      {
+        "description": "Structured Urbanomy input; constraints_json supports scalar parameter extraction.",
+        "params": {
+          "additionalProperties": false,
+          "properties": {
+            "constraints_json": {
+              "description": "For optimization: JSON object of explicit bounds, e.g. {\"l\":{\"min\":1,\"max\":8}}. Do not invent limits. Overrides profile bounds per parameter; without a profile omitted variables stay fixed.",
+              "type": "string"
+            },
+            "constraints_profile": {
+              "description": "Optional test preset: footprint 1 m² to 10% of site area, floors 1–10, MXI 0.1–1, all shares 0–1. Explicit bounds override it.",
+              "enum": [
+                "test"
+              ],
+              "type": "string"
+            },
+            "n_gen": {
+              "maximum": 200.0,
+              "minimum": 1.0,
+              "type": "integer"
+            },
+            "operation": {
+              "description": "Choose land valuation or district scenario optimization.",
+              "enum": [
+                "estimate_land_value",
+                "optimize_district"
+              ],
+              "type": "string"
+            },
+            "pop_size": {
+              "maximum": 100.0,
+              "minimum": 4.0,
+              "type": "integer"
+            },
+            "project_id": {
+              "description": "Optional project label, saved in provenance; does not select data.",
+              "type": "string"
+            },
+            "scenario_id": {
+              "description": "Prepared scenario directory under DATA_DIR. Use list_scenarios; never infer an id.",
+              "type": "string"
+            },
+            "seed": {
+              "minimum": 0.0,
+              "type": "integer"
+            },
+            "strategy": {
+              "description": "User's scenario evaluation strategy (soft preferences).",
+              "type": "string"
+            },
+            "target_id": {
+              "description": "Exact block id from the dataset, as a string. Never invent an id.",
+              "type": "string"
+            },
+            "use_llm": {
+              "description": "Default true. False explicitly disables strategy scoring.",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "operation",
+            "scenario_id",
+            "target_id"
+          ],
+          "type": "object"
+        },
+        "required": true,
+        "uri": "http://localhost:8080/extensions/urbanomy-input/v1"
+      }
+    ],
+    "streaming": true
+  },
+  "defaultInputModes": [
+    "text/plain",
+    "application/json"
+  ],
+  "defaultOutputModes": [
+    "text/plain",
+    "application/json"
+  ],
+  "description": "Land valuation and constrained NSGA-II district optimization with LLM strategy scoring.",
+  "name": "Urbanomy",
+  "skills": [
+    {
+      "description": "Predict target and dataset land value from registered spatial data.",
+      "id": "estimate_land_value",
+      "name": "Оценка земли",
+      "tags": [
+        "land",
+        "valuation"
+      ]
+    },
+    {
+      "description": "Evaluate constrained scenarios and return a Pareto front with economic metrics and optional LLM scores.",
+      "id": "optimize_district",
+      "name": "Оптимизация квартала",
+      "tags": [
+        "urban",
+        "optimization",
+        "strategy"
+      ]
+    }
+  ],
+  "supportedInterfaces": [
+    {
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "1.0",
+      "url": "http://localhost:8080/a2a"
+    }
+  ],
+  "version": "0.1.0"
+}

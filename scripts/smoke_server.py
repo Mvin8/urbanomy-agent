@@ -14,7 +14,7 @@ async def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--url", default="http://localhost:8080")
     parser.add_argument("--compute", action="store_true")
-    parser.add_argument("--dataset", default="baseline")
+    parser.add_argument("--scenario", default="baseline")
     parser.add_argument("--target", default="86")
     args = parser.parse_args()
     token = os.getenv("URBANOMY_API_TOKEN")
@@ -35,11 +35,11 @@ async def main():
                     return result.structuredContent or json.loads(result.content[0].text)
 
                 print("MCP tools:", ", ".join(tool.name for tool in tools.tools))
-                print("Datasets:", await call("list_datasets", {}))
+                print("Scenarios:", await call("list_scenarios", {}))
                 if args.compute:
-                    options = await call("get_optimization_options", dict(dataset_id=args.dataset, target_id=args.target))
+                    options = await call("get_optimization_options", dict(scenario_id=args.scenario, target_id=args.target))
                     print("Selected block:", options["target_id"])
-                    job = await call("estimate_land_value", dict(dataset_id=args.dataset, target_id=args.target))
+                    job = await call("estimate_land_value", dict(scenario_id=args.scenario, target_id=args.target))
                     deadline = time.monotonic() + 180
                     while job["status"] == "working" and time.monotonic() < deadline:
                         await asyncio.sleep(1)
@@ -50,7 +50,7 @@ async def main():
                     spatial = await call("get_job_geojson", {"job_id": job["job_id"]})
                     assert spatial["type"] == "FeatureCollection"
 
-        payload = {"operation": "optimize_district", "dataset_id": args.dataset, "target_id": args.target,
+        payload = {"operation": "optimize_district", "scenario_id": args.scenario, "target_id": args.target,
                    "constraints": {"l": {"min": 1, "max": 3}}, "strategy": "Economic baseline; LLM disabled.",
                    "use_llm": False, "pop_size": 4, "n_gen": 1}
         if not args.compute:

@@ -37,7 +37,7 @@ def wait_for_job(jobs, job_id, owner="mcp", timeout=10):
 
 
 def request(**kwargs):
-    return OptimizationRequest.model_validate(dict(dataset_id="test", target_id=86, constraints={"l": {"min": 1, "max": 8}},
+    return OptimizationRequest.model_validate(dict(scenario_id="test", target_id=86, constraints={"l": {"min": 1, "max": 8}},
                                                      strategy="Mixed use", **kwargs))
 
 
@@ -50,7 +50,7 @@ def rpc(client, method, params):
 def send_params(immediate=False):
     return {"tenant": "test", "configuration": {"returnImmediately": immediate}, "message": {
         "messageId": "m-1", "contextId": "ctx-1", "role": "ROLE_USER", "parts": [
-            {"data": {"operation": "estimate_land_value", "dataset_id": "test", "target_id": "86"}}]}}
+            {"data": {"operation": "estimate_land_value", "scenario_id": "test", "target_id": "86"}}]}}
 
 
 def task_from(response):
@@ -67,7 +67,7 @@ class Model:
 
 
 def optimization(**kwargs):
-    payload = dict(dataset_id="test", target_id=0, constraints={"l": {"min": 2, "max": 6}},
+    payload = dict(scenario_id="test", target_id=0, constraints={"l": {"min": 2, "max": 6}},
                    strategy="Prefer mixed uses", use_llm=False, pop_size=4, n_gen=2)
     payload.update(kwargs)
     return OptimizationRequest.model_validate(payload)

@@ -15,17 +15,18 @@ os.environ.setdefault("MPLCONFIGDIR", str(Path(tempfile.gettempdir()) / "urbanom
 def isolated_environment(monkeypatch):
     """Never inherit a developer's provider credentials, URLs or job settings."""
     for key in list(os.environ):
-        if key.startswith(("URBANOMY_", "OPENAI_", "FP2MP_", "CHAT_")) or key in {"API_KEY", "MODEL_NAME"}:
+        if key.startswith(("URBANOMY_", "OPENAI_", "FP2MP_", "CHAT_")) or key in {"API_KEY", "MODEL_NAME", "DATA_DIR"}:
             monkeypatch.delenv(key)
     monkeypatch.setenv("PYTHON_DOTENV_DISABLED", "1")
 
 @pytest.fixture
 def settings(tmp_path):
-    (tmp_path / "blocks.json").write_text("{}")
-    (tmp_path / "model.cbm").write_text("test")
-    manifest = tmp_path / "datasets.json"
-    manifest.write_text(json.dumps({"test": {"blocks_path": "blocks.json", "model_path": "model.cbm"}}))
-    return Settings(datasets_file=manifest, output_dir=tmp_path / "jobs", max_jobs=2, timeout_seconds=10)
+    scenario = tmp_path / "test"
+    scenario.mkdir()
+    (scenario / "blocks_agg_with_indicators.geojson").write_text("{}")
+    (scenario / "catboost_land_value_no_services.cbm").write_text("test")
+    return Settings(data_dir=tmp_path, output_dir=tmp_path / "jobs", max_jobs=2, timeout_seconds=10)
+
 
 
 @pytest.fixture

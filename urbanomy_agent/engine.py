@@ -8,7 +8,8 @@ from urbanomy.land_value import (
     ScenarioTEPModifier, StrategicAlignmentScorer, build_pareto_front_dataframe,
 )
 
-from .data import DatasetRegistry, target_row
+from .data import ScenarioRegistry, target_row
+from .constraint_profiles import profile_constraints
 from .schemas import Bounds, INDEPENDENT, LAND_USES, OptimizationRequest
 
 PROMPT_VERSION = "urbanomy-strategy-v1"
@@ -28,7 +29,7 @@ def json_safe(value):
 
 def resolve_bounds(request: OptimizationRequest, row):
     """Omitted independent variables stay at baseline; derived bounds filter results."""
-    supplied = request.constraints
+    supplied = profile_constraints(request.constraints_profile, row.site_area, request.constraints)
     shares = np.array([max(float(row[key]), 0) for key in LAND_USES])
     if not np.isfinite(shares).all() or shares.sum() <= 0:
         if not all(key in supplied for key in LAND_USES):
@@ -49,7 +50,7 @@ def resolve_bounds(request: OptimizationRequest, row):
         raise ValueError("Land-use bounds are incompatible with a sum of 1; unspecified shares stay at baseline.")
     if not any(v.max > v.min for v in bounds.values()):
         raise ValueError("At least one independent parameter must have a non-zero range.")
-    return bounds
+    return {**bounds, **{key: value for key, value in supplied.items() if key not in INDEPENDENT}}
 
 
 def project_shares(values, lower, upper):
@@ -116,12 +117,12 @@ def create_scorer(strategy):
     return StrategicAlignmentScorer(llm=llm, prompt=prompt), llm.model_name
 
 
-def execute(operation, request, manifest, progress):
-    blocks, model, provenance = DatasetRegistry(manifest).load(request.dataset_id)
+def execute(operation, request, data_dir, progress):
+    blocks, model, provenance = ScenarioRegistry(data_dir).load(request.scenario_id)
     row = target_row(blocks, request.target_id)
     # The wire format permits string ids; calculations use the dataset's native id.
     native_target_id = row["id"]
-    provenance.update(dataset_id=request.dataset_id, metric_crs=blocks.crs.to_string(),
+    provenance.update(scenario_id=request.scenario_id, project_id=request.project_id, metric_crs=blocks.crs.to_string(),
                       predictions_in_log_scale=True, scope="entire registered dataset")
     estimator_kwargs = {"orig_features": ORIGINAL_FEATURES, "categorical_features": CATEGORICAL_FEATURES}
     if operation == "estimate_land_value":
@@ -141,7 +142,7 @@ def execute(operation, request, manifest, progress):
     final_bounds = {**bounds, **request.constraints}
     problem = ConstrainedDistrictProblem(
         blocks=blocks, model=model, estimator_kwargs=estimator_kwargs,
-        constraints={key: b.model_dump() for key, b in bounds.items()},
+        constraints={key: b.model_dump() for key, b in bounds.items() if key in INDEPENDENT},
         target_id=native_target_id, strategic_alignment_scorer=scorer,
         final_bounds=final_bounds, progress=progress,
     )
@@ -164,7 +165,7 @@ def execute(operation, request, manifest, progress):
                f"до {pareto.land_value_gain.max():,.0f} руб.; NPV выбранного квартала: "
                f"от {pareto.investor_npv.min():,.0f} до {pareto.investor_npv.max():,.0f} руб.")
     return json_safe({"target_id": request.target_id, "strategy": request.strategy,
-                      "use_llm": request.use_llm, "effective_constraints": {k: b.model_dump() for k, b in final_bounds.items()},
+                      "use_llm": request.use_llm, "constraints_profile": request.constraints_profile, "effective_constraints": {k: b.model_dump() for k, b in final_bounds.items()},
                       "baseline_land_value_total": problem.baseline_land_value(), "scenarios": scenarios,
                       "summary": summary, "provenance": provenance,
                       "evaluations": problem.evaluations}), geojson
