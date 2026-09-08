@@ -1,0 +1,126 @@
+{
+  "measured_at": "2026-09-08T14:33:31.272678+00:00",
+  "environment": {
+    "os": "macOS-26.6.2-arm64-arm-64bit",
+    "architecture": "arm64",
+    "python": "3.11.8",
+    "logical_cpus": 10,
+    "physical_cpus": 10,
+    "system_ram_gib": 16.0,
+    "packages": {
+      "catboost": "1.2.10",
+      "numpy": "2.2.6",
+      "pandas": "2.3.3",
+      "geopandas": "1.1.4",
+      "shapely": "2.1.2",
+      "pymoo": "0.6.2",
+      "psutil": "7.2.2"
+    }
+  },
+  "method": "UrbanomyService + spawned workers, no HTTP transport or LLM; process-tree RSS and CPU sampled every 0.1s. RSS includes shared pages per process; CPU is a sampled lower estimate. 100% CPU means one logical core. Wall time includes worker startup, calculation, artifact writes and polling.",
+  "service_init_seconds": 0.000171,
+  "service_init_scope": "Constructor only; excludes Python/import startup and loading data/model.",
+  "samples": [
+    {
+      "operation": "estimate",
+      "concurrency": 1,
+      "repeat": 1,
+      "wall_seconds": 4.384,
+      "peak_tree_rss_mib": 466.3,
+      "sampled_cpu_seconds": 3.863,
+      "average_cpu_percent": 88.1
+    },
+    {
+      "operation": "estimate",
+      "concurrency": 1,
+      "repeat": 2,
+      "wall_seconds": 3.155,
+      "peak_tree_rss_mib": 469.0,
+      "sampled_cpu_seconds": 3.265,
+      "average_cpu_percent": 103.5
+    },
+    {
+      "operation": "estimate",
+      "concurrency": 1,
+      "repeat": 3,
+      "wall_seconds": 3.164,
+      "peak_tree_rss_mib": 466.9,
+      "sampled_cpu_seconds": 3.274,
+      "average_cpu_percent": 103.5
+    },
+    {
+      "operation": "optimize",
+      "concurrency": 1,
+      "repeat": 1,
+      "wall_seconds": 7.192,
+      "peak_tree_rss_mib": 508.5,
+      "sampled_cpu_seconds": 7.552,
+      "average_cpu_percent": 105.0
+    },
+    {
+      "operation": "optimize",
+      "concurrency": 1,
+      "repeat": 2,
+      "wall_seconds": 7.08,
+      "peak_tree_rss_mib": 506.5,
+      "sampled_cpu_seconds": 7.448,
+      "average_cpu_percent": 105.2
+    },
+    {
+      "operation": "optimize",
+      "concurrency": 1,
+      "repeat": 3,
+      "wall_seconds": 7.078,
+      "peak_tree_rss_mib": 507.4,
+      "sampled_cpu_seconds": 7.462,
+      "average_cpu_percent": 105.4
+    },
+    {
+      "operation": "optimize",
+      "concurrency": 2,
+      "repeat": 1,
+      "wall_seconds": 7.2,
+      "peak_tree_rss_mib": 962.7,
+      "sampled_cpu_seconds": 14.64,
+      "average_cpu_percent": 203.3
+    },
+    {
+      "operation": "optimize",
+      "concurrency": 2,
+      "repeat": 2,
+      "wall_seconds": 7.662,
+      "peak_tree_rss_mib": 955.0,
+      "sampled_cpu_seconds": 15.258,
+      "average_cpu_percent": 199.1
+    },
+    {
+      "operation": "optimize",
+      "concurrency": 2,
+      "repeat": 3,
+      "wall_seconds": 7.774,
+      "peak_tree_rss_mib": 956.4,
+      "sampled_cpu_seconds": 15.196,
+      "average_cpu_percent": 195.5
+    }
+  ],
+  "summary": [
+    {
+      "operation": "estimate",
+      "concurrency": 1,
+      "median_wall_seconds": 3.164,
+      "max_tree_rss_mib": 469.0
+    },
+    {
+      "operation": "optimize",
+      "concurrency": 1,
+      "median_wall_seconds": 7.08,
+      "max_tree_rss_mib": 508.5
+    },
+    {
+      "operation": "optimize",
+      "concurrency": 2,
+      "median_wall_seconds": 7.662,
+      "max_tree_rss_mib": 962.7
+    }
+  ]
+}

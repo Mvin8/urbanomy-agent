@@ -1,0 +1,16 @@
+{
+  "scenario_id": "baseline",
+  "target_id": 86,
+  "constraints_profile": "test",
+  "constraints": {
+    "l": {
+      "min": 3,
+      "max": 6
+    }
+  },
+  "strategy": "Evaluate the presented scenario based on the criterion of balancing the interests of various land users.\nAnalyze potential conflicts between residents, pedestrians, drivers, business owners, visitors, employees, seniors, and families with children.",
+  "use_llm": true,
+  "pop_size": 4,
+  "n_gen": 3,
+  "seed": 42
+}

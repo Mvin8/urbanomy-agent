@@ -1,0 +1,9 @@
+{
+  "case": "estimate",
+  "wall_seconds": 21.494,
+  "transport": "MCP Streamable HTTP",
+  "request": {
+    "scenario_id": "baseline",
+    "target_id": 86
+  }
+}

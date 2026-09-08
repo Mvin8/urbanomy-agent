@@ -1,0 +1,23 @@
+{
+  "jsonrpc": "2.0",
+  "id": "demo-estimate",
+  "method": "SendMessage",
+  "params": {
+    "message": {
+      "messageId": "demo-estimate",
+      "role": "ROLE_USER",
+      "parts": [
+        {
+          "data": {
+            "operation": "estimate_land_value",
+            "scenario_id": "baseline",
+            "target_id": 86
+          }
+        }
+      ]
+    },
+    "configuration": {
+      "returnImmediately": true
+    }
+  }
+}

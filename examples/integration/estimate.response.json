@@ -1,0 +1,40 @@
+{
+  "job_id": "898965eaeebb415496104d4d5239b613",
+  "operation": "estimate_land_value",
+  "status": "completed",
+  "elapsed_seconds": 4.1,
+  "result": {
+    "target_id": 86,
+    "land_value": 720316894.4798933,
+    "land_value_per_sqm": 2746.669984187149,
+    "dataset_land_value_total": 75257912950.23567,
+    "currency": "RUB",
+    "summary": "Рассчитана стоимость выбранного квартала с учётом окружения.",
+    "provenance": {
+      "blocks_sha256": "9a5792271aa21d0ca9c4a95f4ed87ba1eca9e809aac5614f33e3473b1ab8897e",
+      "model_sha256": "a39448f9521fc533f86594f541962d0780a35439b4bbd5a443f23dbb5ba530b0",
+      "repaired_ids": [
+        277,
+        296,
+        312,
+        319,
+        342,
+        343
+      ],
+      "excluded_ids": [
+        277,
+        312
+      ],
+      "missing_values": {
+        "share": 5,
+        "land_use": 5,
+        "morphotype": 53
+      },
+      "scenario_id": "baseline",
+      "project_id": null,
+      "metric_crs": "EPSG:32636",
+      "predictions_in_log_scale": true,
+      "scope": "entire registered dataset"
+    }
+  }
+}
